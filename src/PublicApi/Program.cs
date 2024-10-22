@@ -18,12 +18,25 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MinimalApi.Endpoint.Configurations.Extensions;
 using MinimalApi.Endpoint.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// The following line enables Application Insights telemetry collection.
+builder.Services.AddApplicationInsightsTelemetry();
+
+builder.Logging.AddApplicationInsights(
+        configureTelemetryConfiguration: (config) =>
+            config.ConnectionString = builder.Configuration.GetConnectionString("APPLICATIONINSIGHTS_CONNECTION_STRING"),
+            configureApplicationInsightsLoggerOptions: (options) => { }
+    );
+
+builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>("Filter", LogLevel.Trace);
+
 
 builder.Services.AddEndpoints();
 
@@ -176,6 +189,10 @@ app.MapControllers();
 app.MapEndpoints();
 
 app.Logger.LogInformation("LAUNCHING PublicApi");
+
+// throw new Exception("Cannot move further: Program");
+
 app.Run();
+
 
 public partial class Program { }
