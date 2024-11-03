@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.eShopWeb.ApplicationCore.Constants;
 using Xunit;
 
 namespace Microsoft.eShopWeb.FunctionalTests.Web.Pages.Basket;
@@ -44,7 +45,7 @@ public class CheckoutTest : IClassFixture<TestApplication>
         var longinKeyValues = new List<KeyValuePair<string, string>>
         {
             new KeyValuePair<string, string>("email", "demouser@microsoft.com"),
-            new KeyValuePair<string, string>("password", "Pass@word1"),
+            new KeyValuePair<string, string>("password", AuthorizationConstants.DEFAULT_PASSWORD),
             new KeyValuePair<string, string>(WebPageHelpers.TokenTag, WebPageHelpers.GetRequestVerificationToken(await loginResponse.Content.ReadAsStringAsync()))
         };
         var loginFormContent = new FormUrlEncodedContent(longinKeyValues);
