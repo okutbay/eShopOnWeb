@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.eShopWeb;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
+using Microsoft.eShopWeb.ApplicationCore.Services;
 using Microsoft.eShopWeb.Infrastructure.Data;
 using Microsoft.eShopWeb.Infrastructure.Identity;
 using Microsoft.eShopWeb.Web;
@@ -91,6 +92,13 @@ builder.Services.Configure<ServiceConfig>(config =>
 {
     config.Services = new List<ServiceDescriptor>(builder.Services);
     config.Path = "/allservices";
+});
+
+
+// Register Order Items Reserver Service Logic
+builder.Services.AddHttpClient<IOrderItemsReserverService, OrderItemsReserverService>(client =>
+{
+    client.BaseAddress = new Uri("https://eshopokborderitemsreserverfunction.azurewebsites.net/api/OrderItemsReserverFunction");
 });
 
 // blazor configuration
