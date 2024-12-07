@@ -3,7 +3,7 @@ using Microsoft.eShopWeb.ApplicationCore.Entities.OrderAggregate;
 
 namespace Microsoft.eShopWeb.ApplicationCore.Interfaces;
 
-public interface IOrderItemsReserverService
+public interface IServiceBusSenderService
 {
-    Task<bool> ReserveOrderAsync(Order orderDetails);
+    Task SendMessageAsync(Order order);
 }

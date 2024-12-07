@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Net;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.eShopWeb.ApplicationCore.Entities.OrderAggregate;
@@ -15,9 +16,17 @@ public class OrderItemsReserverService : IOrderItemsReserverService
         _httpClient = httpClient;
     }
 
-    public async Task ReserveOrderAsync(Order orderDetails)
+    public async Task<bool> ReserveOrderAsync(Order orderDetails)
     {
-        var response = await _httpClient.PostAsJsonAsync("OrderItemsReserverFunction", orderDetails);
-        response.EnsureSuccessStatusCode();
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("OrderItemsReserverFunction", orderDetails);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch (HttpRequestException ex)
+        {
+            return false;
+        }
     }
 }
