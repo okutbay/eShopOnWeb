@@ -1,4 +1,5 @@
 ﻿@page
+@using Microsoft.eShopWeb.ApplicationCore.Constants
 @model LoginModel
 
 @{
@@ -50,7 +51,7 @@
                         User:     <b>demouser@microsoft.com</b> OR <b>admin@microsoft.com</b>
                     </p>
                     <p>
-                        Password: <b>Pass@word1</b>
+                        Password: <b>@AuthorizationConstants.DEFAULT_PASSWORD</b>
                     </p>
                 </form>
             </section>

@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.eShopWeb.ApplicationCore.Constants;
 using Xunit;
 
 namespace Microsoft.eShopWeb.FunctionalTests.Web.Controllers;
@@ -63,7 +64,7 @@ public class AccountControllerSignIn : IClassFixture<TestApplication>
         var keyValues = new List<KeyValuePair<string, string>>
         {
             new KeyValuePair<string, string>("Email", "demouser@microsoft.com"),
-            new KeyValuePair<string, string>("Password", "Pass@word1"),
+            new KeyValuePair<string, string>("Password", AuthorizationConstants.DEFAULT_PASSWORD),
             new KeyValuePair<string, string>(WebPageHelpers.TokenTag, WebPageHelpers.GetRequestVerificationToken(stringResponse1))
         };
         var formContent = new FormUrlEncodedContent(keyValues);
@@ -83,7 +84,7 @@ public class AccountControllerSignIn : IClassFixture<TestApplication>
         var keyValues = new List<KeyValuePair<string, string>>
         {
             new KeyValuePair<string, string>("Email", "demouser@microsoft.com"),
-            new KeyValuePair<string, string>("Password", "Pass@word1"),
+            new KeyValuePair<string, string>("Password", AuthorizationConstants.DEFAULT_PASSWORD),
             new KeyValuePair<string, string>(WebPageHelpers.TokenTag, WebPageHelpers.GetRequestVerificationToken(stringResponse1))
         };
         var formContent = new FormUrlEncodedContent(keyValues);

@@ -1,23 +1,29 @@
-﻿using System.Net.Mime;
+﻿using System.Configuration;
+using System.Net.Mime;
 using Ardalis.ListStartupServices;
 using Azure.Identity;
+using Azure.Messaging.ServiceBus;
 using BlazorAdmin;
 using BlazorAdmin.Services;
 using Blazored.LocalStorage;
 using BlazorShared;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.eShopWeb;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
+using Microsoft.eShopWeb.ApplicationCore.Services;
 using Microsoft.eShopWeb.Infrastructure.Data;
 using Microsoft.eShopWeb.Infrastructure.Identity;
 using Microsoft.eShopWeb.Web;
 using Microsoft.eShopWeb.Web.Configuration;
 using Microsoft.eShopWeb.Web.HealthChecks;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddConsole();
@@ -92,6 +98,42 @@ builder.Services.Configure<ServiceConfig>(config =>
     config.Services = new List<ServiceDescriptor>(builder.Services);
     config.Path = "/allservices";
 });
+
+
+// Register Order Items Reserver Service Logic
+builder.Services.AddHttpClient<IOrderItemsReserverService, OrderItemsReserverService>(client =>
+{
+    client.BaseAddress = new Uri("https://eshopokborderitemsreserverfunction.azurewebsites.net/api/OrderItemsReserverFunction");
+});
+
+#region ServiceBus
+
+//var serviceBusConnectionString = Environment.GetEnvironmentVariable("ServiceBusConnectionString");
+//var serviceBusQueueName = Environment.GetEnvironmentVariable("ServiceBusQueueName");
+
+var serviceBusSettings = builder.Configuration.GetSection("ServiceBus");
+var serviceBusConnectionString = serviceBusSettings["ServiceBusConnectionString"];
+var serviceBusQueueName = serviceBusSettings["ServiceBusQueueName"];
+
+if (string.IsNullOrEmpty(serviceBusConnectionString))
+{
+    throw new InvalidOperationException(
+        "Please specify a valid ServiceBusConnectionString");
+}
+
+if (string.IsNullOrEmpty(serviceBusQueueName))
+{
+    throw new InvalidOperationException(
+        "Please specify a valid serviceBusQueueName");
+}
+
+builder.Services.AddScoped<IServiceBusSenderService, ServiceBusSenderService>(
+    serviceProvider => new ServiceBusSenderService(
+        connectionString: serviceBusConnectionString,
+        queueName: serviceBusQueueName)
+    );
+
+#endregion
 
 // blazor configuration
 var configSection = builder.Configuration.GetRequiredSection(BaseUrlConfiguration.CONFIG_NAME);
