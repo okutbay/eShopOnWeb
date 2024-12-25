@@ -103,7 +103,7 @@ builder.Services.Configure<ServiceConfig>(config =>
 // Register Order Items Reserver Service Logic
 builder.Services.AddHttpClient<IOrderItemsReserverService, OrderItemsReserverService>(client =>
 {
-    client.BaseAddress = new Uri("https://_eshopokborderitemsreserverfunction.azurewebsites.net/api/OrderItemsReserverFunction");
+    client.BaseAddress = new Uri("https://eshopokborderitemsreserverfunction.azurewebsites.net/api/OrderItemsReserverFunction");
 });
 
 #region ServiceBus

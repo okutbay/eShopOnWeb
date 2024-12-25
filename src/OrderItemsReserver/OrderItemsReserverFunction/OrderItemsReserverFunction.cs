@@ -31,18 +31,40 @@ public class OrderItemsReserverFunction
         var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
         var containerName = _configuration["OrderBlobContainerName"] ?? "orders";
 
-        // Get reference to the Blob container and blob
-        var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-        await containerClient.CreateIfNotExistsAsync();
+        int maxRetries = 3;
 
-        var blobName = $"{System.Guid.NewGuid()}.json";
-        var blobClient = containerClient.GetBlobClient(blobName);
+        for (var retry = 1; retry <= maxRetries; retry++)
+        {
+            try
+            {
+                // Get reference to the Blob container and blob
+                var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
+                await containerClient.CreateIfNotExistsAsync();
 
-        // Upload the JSON data to blob storage
-        using var memoryStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
-        await blobClient.UploadAsync(memoryStream);
+                var blobName = $"{System.Guid.NewGuid()}.json";
+                var blobClient = containerClient.GetBlobClient(blobName);
 
-        // Return success response
-        return new OkObjectResult("Order request uploaded successfully.");
+                // Upload the JSON data to blob storage
+                using var memoryStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(requestBody));
+                await blobClient.UploadAsync(memoryStream);
+
+                // Return success response
+                return new OkObjectResult("Order request uploaded successfully.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to upload order on attempt {retry}: {ex.Message}.");
+            }
+        }
+
+        return new ObjectResult(new ProblemDetails
+        {
+            Status = 500,
+            Title = "Internal Server Error",
+            Detail = $"Failed to upload order after '{maxRetries}' attempt(s)."
+        })
+        {
+            StatusCode = 500
+        };
     }
 }
